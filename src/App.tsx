@@ -3,27 +3,20 @@ import './App.css';
 
 function App() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [textNodes, setTextNodes] = useState<string[]>([]);
+  const [firstLineHeight, setFirstLineHeight] = useState<number | null>(null);
+
 
   useEffect(() => {
 
-    if (containerRef.current) {
-      const nodes = containerRef.current.childNodes
-      const texts: string[] = []
+    const paragraph = containerRef.current?.querySelector("p")
+    if (paragraph && paragraph.firstChild?.nodeType === Node.TEXT_NODE) {
+      const range = document.createRange();
+      range.selectNodeContents(paragraph);
+      range.setEnd(paragraph.firstChild!, 1)
 
 
-      nodes.forEach((node) => {
-        if (node.nodeType === 3) {
-
-          const text = node.textContent?.trim();
-          if (text) {
-            texts.push(text)
-          }
-        }
-      })
-
-      setTextNodes(texts)
-
+      const rect = range.getBoundingClientRect()
+      setFirstLineHeight(rect.height)
     }
 
   }, [])
@@ -31,19 +24,18 @@ function App() {
   return (
     <div className="App">
       <div ref={containerRef}>
-        Hello this is some text
-        <p>this is paragrph text</p>
-        <span>this is span text</span>
-        this is last text
+        <p>
+          Hello this is Swetha.
+          I really wanna do good on my test tomorrow.
+          Jai Shri Krishna
+        </p>
       </div>
 
-      <div>
-        <ul>
-          {textNodes.map((text, idx) => (
-            <li key={idx}>{text}</li>
-          ))}
-        </ul>
+      {firstLineHeight != null && <div>
+
+        <span>{firstLineHeight}</span>
       </div>
+      }
     </div>
   );
 }
