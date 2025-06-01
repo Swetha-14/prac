@@ -1,41 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
+import { useDebounce } from './useDebounce';
 
 function App() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [firstLineHeight, setFirstLineHeight] = useState<number | null>(null);
-
-
-  useEffect(() => {
-
-    const paragraph = containerRef.current?.querySelector("p")
-    if (paragraph && paragraph.firstChild?.nodeType === Node.TEXT_NODE) {
-      const range = document.createRange();
-      range.selectNodeContents(paragraph);
-      range.setEnd(paragraph.firstChild!, 1)
-
-
-      const rect = range.getBoundingClientRect()
-      setFirstLineHeight(rect.height)
-    }
-
-  }, [])
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500)
 
   return (
-    <div className="App">
-      <div ref={containerRef}>
-        <p>
-          Hello this is Swetha.
-          I really wanna do good on my test tomorrow.
-          Jai Shri Krishna
-        </p>
-      </div>
+    <div className="App" style={{ marginTop: 500 }}>
 
-      {firstLineHeight != null && <div>
+      <input
+        type="search"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        placeholder="Type something"
+      />
 
-        <span>{firstLineHeight}</span>
-      </div>
-      }
+      <span> Search: {search}</span>
+      <span> Debounced Search: {debouncedSearch} </span>
     </div>
   );
 }
