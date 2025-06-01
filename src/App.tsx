@@ -1,23 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { useDebounce } from './useDebounce';
+import { StarRating } from './StarRating';
 
 function App() {
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 500)
+  const [rating, setRating] = useState(0);
 
   return (
     <div className="App" style={{ marginTop: 500 }}>
 
-      <input
-        type="search"
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        placeholder="Type something"
-      />
-
-      <span> Search: {search}</span>
-      <span> Debounced Search: {debouncedSearch} </span>
+      <h3>Your Rating: {rating}</h3>
+      <StarRating max={5} onChange={setRating} />
     </div>
   );
 }
