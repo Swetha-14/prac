@@ -1,58 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
-import './App.css';
-import { useValidatedInput } from './hooks/useValidatedInput';
+import { UserProvider, useUser } from "./UserContext";
 
-interface User {
-  id: string;
-  name: string;
-  email: string
-}
-
-function App() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-
-
-  useEffect(() => {
-
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("https://jsonplaceholder.typicode.com/users");
-        if (!response.ok) throw new Error("Failed to fetch users");
-        const data: User[] = await response.json();
-        setUsers(data)
-        setError(null)
-      } catch (err: any) {
-        setError(err.message || "Unknown Error ")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchUsers();
-
-  }, [])
+function UserProfile() {
+  const { user, login, logout } = useUser();
 
   return (
-    <div className="App" style={{ marginTop: 500 }}>
-      <div style={{ padding: 20 }}>
-        <h2>Users List</h2>
+    <div>
 
-        {loading && <p>Loading...</p>}
-        {error && <p>{error}</p>}
-
-        {!loading && !error && (
-          <ul>
-            {users.map((user) => (
-              <li key={user.id}>{user.name} - {user.email}</li>
-            ))}
-          </ul>
-        )}
-
-      </div>
+      {user ? (
+        <>
+          <h2>Welcome {user.name}</h2>
+          <p>{user.email}</p>
+          <button onClick={logout}>Logout</button>
+        </>
+      ) : (
+        <>
+          <h2>No User Logged In</h2>
+          <button onClick={() => login({ name: "Swetha Sukuamar", email: "swethasukumar14@gmail.com" })}>Login</button>
+        </>
+      )}
     </div>
-  );
+  )
+
+}
+
+
+
+function App() {
+  return (
+    <UserProvider>
+      <UserProfile />
+    </UserProvider>
+  )
 }
 
 export default App;
