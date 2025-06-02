@@ -2,39 +2,55 @@ import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { useValidatedInput } from './hooks/useValidatedInput';
 
-function App() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const { errors, validate } = useValidatedInput(name, email)
+interface User {
+  id: string;
+  name: string;
+  email: string
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (validate()) {
-      alert(`Submitting ${name} and ${email}`)
+function App() {
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+
+
+  useEffect(() => {
+
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("https://jsonplaceholder.typicode.com/users");
+        if (!response.ok) throw new Error("Failed to fetch users");
+        const data: User[] = await response.json();
+        setUsers(data)
+        setError(null)
+      } catch (err: any) {
+        setError(err.message || "Unknown Error ")
+      } finally {
+        setLoading(false)
+      }
     }
-  }
+
+    fetchUsers();
+
+  }, [])
 
   return (
     <div className="App" style={{ marginTop: 500 }}>
+      <div style={{ padding: 20 }}>
+        <h2>Users List</h2>
 
-      <form onSubmit={handleSubmit} noValidate>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Type name"
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Type Email" />
+        {loading && <p>Loading...</p>}
+        {error && <p>{error}</p>}
 
-        <button type="submit">Submit</button>
-      </form>
+        {!loading && !error && (
+          <ul>
+            {users.map((user) => (
+              <li key={user.id}>{user.name} - {user.email}</li>
+            ))}
+          </ul>
+        )}
 
-      {errors.name && <span style={{ color: "red" }}>{errors.name}</span>}
-      {errors.email && <span style={{ color: "red" }}>{errors.email}</span>}
+      </div>
     </div>
   );
 }
