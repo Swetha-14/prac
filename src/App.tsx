@@ -1,36 +1,81 @@
-import { UserProvider, useUser } from "./UserContext";
+import { useReducer } from "react";
 
-function UserProfile() {
-  const { user, login, logout } = useUser();
 
-  return (
-    <div>
-
-      {user ? (
-        <>
-          <h2>Welcome {user.name}</h2>
-          <p>{user.email}</p>
-          <button onClick={logout}>Logout</button>
-        </>
-      ) : (
-        <>
-          <h2>No User Logged In</h2>
-          <button onClick={() => login({ name: "Swetha Sukuamar", email: "swethasukumar14@gmail.com" })}>Login</button>
-        </>
-      )}
-    </div>
-  )
-
+type Todo = {
+  id: number;
+  title: string;
+  complete: boolean;
 }
 
+const initialTodos: Todo[] = [
+  {
+    id: 1,
+    title: "Todo 1",
+    complete: false
+  },
+  {
+    id: 2,
+    title: "Todo 2",
+    complete: false
+  },
+  {
+    id: 3,
+    title: "Todo 3",
+    complete: false
+  },
+  {
+    id: 4,
+    title: "Todo 4",
+    complete: false
+  },
+  {
+    id: 5,
+    title: "Todo 5",
+    complete: false
+  }
+]
 
+
+const reducer = (state: any, action: any) => {
+  switch (action.type) {
+    case "COMPLETE":
+      return state.map((todo: Todo) => {
+        if (todo.id === action.id) {
+          return { ...todo, complete: !todo.complete }
+        } else {
+          return todo
+        }
+      })
+    default:
+      return state;
+  }
+}
 
 function App() {
+  const [todos, dispatch] = useReducer(reducer, initialTodos);
+
+  const handleChange = (todo: Todo) => {
+    dispatch({ type: "COMPLETE", id: todo.id })
+  }
+
   return (
-    <UserProvider>
-      <UserProfile />
-    </UserProvider>
+    <>
+
+      {todos.map((todo: Todo) => (
+        <div key={todo.id}>
+          <label>
+            <input
+              type="checkbox"
+              checked={todo.complete}
+              onChange={() => handleChange(todo)}
+            />
+            {todo.title}
+          </label>
+        </div>
+      ))}
+    </>
   )
 }
+
 
 export default App;
